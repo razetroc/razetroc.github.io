@@ -3,273 +3,700 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ralph Corteza | Operations & AI Productivity Portfolio</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Ralph Corteza — Ops & AI Productivity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: #0A0A0A;
+      color: #F5F5F0;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    ::selection { background: #C8A84E; color: #0A0A0A; }
+
+    .noise {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 256px 256px;
+    }
+
+    .orb {
+      position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0;
+    }
+    .orb-1 { width: 600px; height: 600px; background: rgba(200, 168, 78, 0.06); top: -200px; right: -200px; }
+    .orb-2 { width: 500px; height: 500px; background: rgba(255, 255, 255, 0.03); bottom: -150px; left: -150px; }
+
+    .reveal { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(8px); transition: all 900ms cubic-bezier(0.32, 0.72, 0, 1); }
+    .reveal.visible { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+
+    .reveal-l { opacity: 0; transform: translateX(-40px); filter: blur(8px); transition: all 900ms cubic-bezier(0.32, 0.72, 0, 1); }
+    .reveal-l.visible { opacity: 1; transform: translateX(0); filter: blur(0); }
+
+    .reveal-r { opacity: 0; transform: translateX(40px); filter: blur(8px); transition: all 900ms cubic-bezier(0.32, 0.72, 0, 1); }
+    .reveal-r.visible { opacity: 1; transform: translateX(0); filter: blur(0); }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Nav ── */
+    .nav-wrap { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: center; padding-top: 20px; pointer-events: none; }
+    .nav-inner {
+      pointer-events: all;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 10px 8px 24px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);
+      border: 1px solid rgba(255,255,255,0.06);
+      min-width: 280px; max-width: 600px; width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .nav-brand { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.02em; color: #C8A84E; }
+    .nav-links { display: none; gap: 20px; }
+    .nav-links a { font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); transition: color 0.4s cubic-bezier(0.32,0.72,0,1); }
+    .nav-links a:hover { color: #C8A84E; }
+    @media (min-width: 900px) { .nav-links { display: flex; } }
+
+    .hamburger {
+      display: flex; flex-direction: column; gap: 4px;
+      background: none; border: none; cursor: pointer; padding: 6px;
+      position: relative; width: 28px; height: 28px;
+      align-items: center; justify-content: center;
+    }
+    @media (min-width: 900px) { .hamburger { display: none; } }
+    .hamburger span {
+      display: block; width: 18px; height: 1.5px; background: #C8A84E;
+      border-radius: 2px;
+      transition: all 500ms cubic-bezier(0.32, 0.72, 0, 1);
+      position: absolute;
+    }
+    .hamburger span:nth-child(1) { transform: translateY(-5px); }
+    .hamburger span:nth-child(2) { transform: translateY(0); }
+    .hamburger span:nth-child(3) { transform: translateY(5px); }
+    .hamburger.active span:nth-child(1) { transform: translateY(0) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.active span:nth-child(3) { transform: translateY(0) rotate(-45deg); }
+
+    .nav-overlay {
+      position: fixed; inset: 0; z-index: 90;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(48px); -webkit-backdrop-filter: blur(48px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 600ms cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .nav-overlay.open { opacity: 1; pointer-events: all; }
+    .nav-link-mob {
+      opacity: 0; transform: translateY(24px);
+      transition: all 600ms cubic-bezier(0.32, 0.72, 0, 1);
+      font-size: 1.6rem; font-weight: 600; color: rgba(255,255,255,0.6);
+    }
+    .nav-overlay.open .nav-link-mob { opacity: 1; transform: translateY(0); }
+    .nav-overlay.open .nav-link-mob:nth-child(1) { transition-delay: 60ms; }
+    .nav-overlay.open .nav-link-mob:nth-child(2) { transition-delay: 110ms; }
+    .nav-overlay.open .nav-link-mob:nth-child(3) { transition-delay: 160ms; }
+    .nav-overlay.open .nav-link-mob:nth-child(4) { transition-delay: 210ms; }
+    .nav-overlay.open .nav-link-mob:nth-child(5) { transition-delay: 260ms; }
+    .nav-overlay.open .nav-link-mob:nth-child(6) { transition-delay: 310ms; }
+    .nav-overlay.open .nav-link-mob:nth-child(7) { transition-delay: 360ms; }
+    .nav-overlay.open .nav-link-mob:nth-child(8) { transition-delay: 410ms; }
+
+    /* ── Shell / Core ── */
+    .shell {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      padding: 1.5px;
+      border-radius: 28px;
+      transition: all 500ms cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .shell:hover { border-color: rgba(200, 168, 78, 0.15); }
+    .core {
+      background: rgba(255,255,255,0.03);
+      border-radius: calc(28px - 2px);
+      padding: 28px;
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.06);
+      transition: all 500ms cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .shell-lg { border-radius: 32px; padding: 2px; }
+    .shell-lg .core { border-radius: calc(32px - 3px); padding: 40px; }
+    @media (max-width: 768px) { .shell-lg .core { padding: 24px; } }
+
+    /* ── Sections ── */
+    section { position: relative; z-index: 1; }
+
+    .eyebrow {
+      display: inline-flex; align-items: center;
+      padding: 5px 14px; border-radius: 999px;
+      font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2em;
+      background: rgba(200, 168, 78, 0.08);
+      border: 1px solid rgba(200, 168, 78, 0.12);
+      color: #C8A84E;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4.5vw, 3.4rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      max-width: 700px;
+    }
+
+    .section-pad { padding: 80px 20px; }
+    @media (min-width: 768px) { .section-pad { padding: 120px 32px; } }
+    @media (min-width: 1200px) { .section-pad { padding: 140px 48px; } }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* ── Hero ── */
+    .hero { min-height: 100dvh; display: flex; align-items: center; padding: 80px 20px 60px; }
+    .hero-tag { color: rgba(255,255,255,0.3); font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px; }
+    .hero h1 { font-size: clamp(2.8rem, 9vw, 6.5rem); font-weight: 800; letter-spacing: -0.04em; line-height: 0.95; margin-bottom: 10px; }
+    .hero h1 .accent { color: #C8A84E; }
+    .hero h2 { font-size: clamp(1.1rem, 2vw, 1.5rem); font-weight: 400; color: rgba(255,255,255,0.35); margin-top: 18px; max-width: 640px; line-height: 1.6; letter-spacing: -0.01em; }
+    .hero p { color: rgba(255,255,255,0.25); max-width: 560px; font-size: 0.92rem; line-height: 1.8; margin-top: 24px; font-weight: 300; }
+
+    .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 40px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 999px;
+      font-size: 0.82rem; font-weight: 600;
+      transition: all 500ms cubic-bezier(0.32, 0.72, 0, 1);
+      cursor: pointer; border: none;
+    }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: #C8A84E; color: #0A0A0A;
+    }
+    .btn-primary:hover { background: #D4B85A; transform: translateY(-2px); box-shadow: 0 12px 32px rgba(200,168,78,0.18); }
+
+    .btn-icon-wrap {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(0,0,0,0.15);
+      transition: all 500ms cubic-bezier(0.32, 0.72, 0, 1);
+      font-size: 0.75rem;
+    }
+    .btn:hover .btn-icon-wrap { transform: translateX(3px) translateY(-2px) scale(1.08); }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.6);
+    }
+    .btn-outline:hover { border-color: rgba(200,168,78,0.3); color: #C8A84E; background: rgba(200,168,78,0.04); }
+
+    /* ── Stats ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    @media (min-width: 600px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+    .stat-num { font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em; color: #C8A84E; }
+    .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.3); margin-top: 4px; font-weight: 500; }
+
+    /* ── About ── */
+    .about-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
+    @media (min-width: 768px) { .about-grid { grid-template-columns: 1.4fr 1fr; } }
+    .about-text p { color: rgba(255,255,255,0.45); font-size: 0.92rem; line-height: 1.8; font-weight: 300; margin-bottom: 16px; }
+    .about-text p:last-child { margin-bottom: 0; }
+
+    .strength-list { list-style: none; }
+    .strength-list li {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.85rem; color: rgba(255,255,255,0.55); font-weight: 400;
+    }
+    .strength-list li:last-child { border-bottom: none; }
+    .strength-list li::before {
+      content: '';
+      display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+      background: #C8A84E; flex-shrink: 0;
+    }
+
+    /* ── Services ── */
+    .services-grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+    @media (min-width: 600px) { .services-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1000px) { .services-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .srv-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(200, 168, 78, 0.08);
+      border: 1px solid rgba(200, 168, 78, 0.1);
+      display: flex; align-items: center; justify-content: center;
+      color: #C8A84E; font-size: 0.9rem; margin-bottom: 16px;
+    }
+    .srv-title { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 6px; }
+    .srv-desc { font-size: 0.82rem; color: rgba(255,255,255,0.35); line-height: 1.7; font-weight: 300; }
+
+    /* ── Skills ── */
+    .skills-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+    .skill-pill {
+      padding: 8px 16px; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 500;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.5);
+      transition: all 400ms cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .skill-pill:hover {
+      border-color: rgba(200,168,78,0.25);
+      color: #C8A84E;
+      background: rgba(200,168,78,0.05);
+      transform: translateY(-2px);
+    }
+
+    /* ── Case Studies ── */
+    .case-grid { display: grid; gap: 14px; }
+    .case-num {
+      font-size: 0.65rem; font-weight: 700; color: rgba(200,168,78,0.3);
+      border: 1px solid rgba(200,168,78,0.08);
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .case-row { display: flex; gap: 16px; align-items: flex-start; }
+    .case-row h3 { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
+    .case-row p { font-size: 0.82rem; color: rgba(255,255,255,0.35); line-height: 1.7; font-weight: 300; }
+
+    /* ── Resume ── */
+    .resume-title-line { font-size: 0.72rem; color: #C8A84E; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 16px; }
+    .resume-body p { color: rgba(255,255,255,0.45); font-size: 0.92rem; line-height: 1.8; font-weight: 300; margin-bottom: 20px; }
+    .resume-list { list-style: none; display: grid; gap: 8px; }
+    .resume-list li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.85rem; color: rgba(255,255,255,0.45); font-weight: 300;
+    }
+    .resume-list li::before {
+      content: ''; display: inline-block; width: 4px; height: 4px; border-radius: 50%;
+      background: #C8A84E; flex-shrink: 0;
+    }
+
+    /* ── Contact ── */
+    .contact-card { text-align: center; }
+    .contact-card .srv-icon { margin: 0 auto 16px; width: 48px; height: 48px; font-size: 1.2rem; }
+    .email-big {
+      font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 700;
+      color: #C8A84E; letter-spacing: -0.02em;
+      transition: all 400ms cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .email-big:hover { color: #D4B85A; }
+
+    /* ── Footer ── */
+    footer { border-top: 1px solid rgba(255,255,255,0.04); padding: 28px 20px; text-align: center; position: relative; z-index: 1; }
+    footer p { font-size: 0.72rem; color: rgba(255,255,255,0.2); font-weight: 400; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: clamp(2.2rem, 12vw, 3.2rem); }
+      .section-title { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+      .shell-lg .core { padding: 24px 18px; }
+      .core { padding: 20px; }
+      .section-pad { padding: 64px 16px; }
+      .stats-grid { gap: 4px; }
+      .stat-num { font-size: 1.4rem; }
+      .nav-inner { padding: 6px 6px 6px 16px; min-width: unset; width: calc(100% - 24px); }
+    }
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <nav class="navbar">
-      <a href="#home" class="logo">Ralph Corteza</a>
 
-      <button class="menu-toggle" id="menuToggle">☰</button>
+  <div class="noise"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
 
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#skills">Skills & Tools</a></li>
-        <li><a href="#case-studies">Case Studies</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#resume">Resume</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
+  <!-- ─── Floating Island Nav ─── -->
+  <div class="nav-wrap">
+    <div class="nav-inner">
+      <span class="nav-brand">RC</span>
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#skills">Skills</a>
+        <a href="#case-studies">Work</a>
+        <a href="#resume">Resume</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <button class="hamburger" id="hamBtn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
 
-  <main>
-    <section id="home" class="hero section">
-      <div class="hero-content">
-        <p class="eyebrow">Remote Operations • Executive Support • CRM • AI Productivity</p>
-        <h1>Ralph Corteza</h1>
-        <h2>Operations Manager | Executive Assistant | CRM & AI Productivity Specialist</h2>
+  <div class="nav-overlay" id="navOverlay">
+    <div class="flex flex-col items-center gap-6" style="display:flex;flex-direction:column;align-items:center;gap:28px;">
+      <a href="#about" class="nav-link-mob">About</a>
+      <a href="#services" class="nav-link-mob">Services</a>
+      <a href="#skills" class="nav-link-mob">Skills</a>
+      <a href="#case-studies" class="nav-link-mob">Work</a>
+      <a href="#projects" class="nav-link-mob">Projects</a>
+      <a href="#resume" class="nav-link-mob">Resume</a>
+      <a href="#contact" class="nav-link-mob">Contact</a>
+    </div>
+  </div>
+
+  <!-- ─── Hero ─── -->
+  <section class="hero">
+    <div class="container" style="width:100%;">
+      <div class="reveal-l">
+        <span class="hero-tag">Remote Operations &bull; Executive Support &bull; AI Productivity</span>
+      </div>
+      <div class="reveal" style="transition-delay:120ms;">
+        <h1>Ralph<br /><span class="accent">Corteza</span></h1>
+        <h2>Ops Manager &bull; Executive Assistant &bull; CRM &amp; AI Specialist</h2>
         <p>
           I help busy real estate and business teams stay organized, improve systems,
-          manage CRM workflows, support marketing operations, coordinate documentation,
-          and use AI tools more productively.
+          manage CRM workflows, support marketing operations, and use AI tools more productively.
         </p>
-        <div class="hero-buttons">
-          <a href="#case-studies" class="btn primary">View Case Studies</a>
-          <a href="#contact" class="btn secondary">Contact Me</a>
+      </div>
+      <div class="btn-row reveal" style="transition-delay:250ms;">
+        <a href="#case-studies" class="btn btn-primary">
+          View case studies
+          <span class="btn-icon-wrap"><i class="ri-arrow-right-up-line"></i></span>
+        </a>
+        <a href="#contact" class="btn btn-outline">
+          <i class="ri-mail-line"></i>
+          Get in touch
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Stats ─── -->
+  <section class="section-pad" style="padding-top:0;padding-bottom:0;">
+    <div class="container">
+      <div class="shell shell-lg reveal">
+        <div class="core" style="padding:32px 40px;">
+          <div class="stats-grid">
+            <div><div class="stat-num">7</div><div class="stat-label">Years Experience</div></div>
+            <div><div class="stat-num">200+</div><div class="stat-label">Projects Supported</div></div>
+            <div><div class="stat-num">12+</div><div class="stat-label">Tools Mastered</div></div>
+            <div><div class="stat-num">100%</div><div class="stat-label">Remote Ready</div></div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="about" class="section">
-      <div class="section-heading">
-        <p class="eyebrow">About</p>
-        <h2>Reliable Support for Operations, Systems, and Execution.</h2>
+  <!-- ─── About ─── -->
+  <section id="about" class="section-pad">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">About</span>
+        <h2 class="section-title">Reliable support for operations, systems, and execution.</h2>
       </div>
-      <div class="about-grid">
-        <div>
+      <div class="about-grid" style="margin-top:40px;">
+        <div class="about-text reveal" style="transition-delay:100ms;">
           <p>
-            I have nearly seven years of experience supporting a Canadian real estate
-            business with day-to-day operations, executive assistance, CRM administration,
-            database management, marketing support, website updates, transaction coordination,
-            documentation, workflow organization, and AI productivity support.
+            Nearly seven years supporting a Canadian real estate business with day-to-day
+            operations, executive assistance, CRM administration, database management,
+            marketing support, website updates, transaction coordination, documentation,
+            workflow organization, and AI productivity.
           </p>
           <p>
             My work focuses on helping teams stay organized, reduce manual tasks, improve
             follow-up processes, maintain accurate records, and keep projects moving.
           </p>
         </div>
-        <div class="highlight-card">
-          <h3>CORE STRENGHT</h3>
-          <ul>
-            <li>Executive and administrative support</li>
-            <li>CRM and database organization</li>
-            <li>Marketing and website support</li>
-            <li>Workflow documentation</li>
-            <li>AI-assisted productivity and research</li>
-          </ul>
+        <div class="reveal" style="transition-delay:200ms;">
+          <div class="shell" style="border-color:rgba(200,168,78,0.08);">
+            <div class="core">
+              <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:#C8A84E;">Core Strengths</span>
+              <ul class="strength-list" style="margin-top:16px;">
+                <li>Executive &amp; administrative support</li>
+                <li>CRM &amp; database organization</li>
+                <li>Marketing &amp; website support</li>
+                <li>Workflow documentation</li>
+                <li>AI-assisted productivity &amp; research</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="services" class="section dark-section">
-      <div class="section-heading">
-        <p class="eyebrow">Services</p>
-        <h2>Support Areas I Can Help With</h2>
+  <!-- ─── Services ─── -->
+  <section id="services" class="section-pad" style="background:rgba(255,255,255,0.015);">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">Services</span>
+        <h2 class="section-title">Support areas I can help with.</h2>
       </div>
+      <div class="services-grid" style="margin-top:40px;">
+        <div class="shell reveal" style="transition-delay:60ms;"><div class="core">
+          <div class="srv-icon"><i class="ri-calendar-line"></i></div>
+          <div class="srv-title">Executive Support</div>
+          <div class="srv-desc">Calendar support, task tracking, inbox assistance, follow-ups, reminders, and administrative coordination.</div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:110ms;"><div class="core">
+          <div class="srv-icon"><i class="ri-database-2-line"></i></div>
+          <div class="srv-title">CRM Administration</div>
+          <div class="srv-desc">Lead organization, database cleanup, pipeline support, tags, workflows, and basic automation coordination.</div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:160ms;"><div class="core">
+          <div class="srv-icon"><i class="ri-settings-3-line"></i></div>
+          <div class="srv-title">Business Operations</div>
+          <div class="srv-desc">Process organization, internal documentation, reporting support, task management, and operational follow-through.</div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:210ms;"><div class="core">
+          <div class="srv-icon"><i class="ri-megaphone-line"></i></div>
+          <div class="srv-title">Marketing Support</div>
+          <div class="srv-desc">Website updates, content management, Canva designs, listing support materials, and campaign coordination.</div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:260ms;"><div class="core">
+          <div class="srv-icon"><i class="ri-file-text-line"></i></div>
+          <div class="srv-title">Transaction Support</div>
+          <div class="srv-desc">Document coordination, listing preparation, compliance support, forms, checklists, and deadline tracking.</div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:310ms;"><div class="core">
+          <div class="srv-icon"><i class="ri-sparkling-2-line"></i></div>
+          <div class="srv-title">AI Productivity</div>
+          <div class="srv-desc">Research, prompt building, workflow assistance, documentation, content drafting, and AI tool organization.</div>
+        </div></div>
+      </div>
+    </div>
+  </section>
 
-      <div class="card-grid">
-        <div class="card">
-          <h3>Executive Support</h3>
-          <p>Calendar support, task tracking, inbox assistance, follow-ups, reminders, and administrative coordination.</p>
+  <!-- ─── Skills ─── -->
+  <section id="skills" class="section-pad">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">Skills &amp; Tools</span>
+        <h2 class="section-title">Practical tools used for remote operations.</h2>
+      </div>
+      <div class="skills-cloud" style="margin-top:40px;">
+        <span class="skill-pill reveal" style="transition-delay:40ms;">Google Workspace</span>
+        <span class="skill-pill reveal" style="transition-delay:70ms;">Microsoft Office</span>
+        <span class="skill-pill reveal" style="transition-delay:100ms;">WordPress</span>
+        <span class="skill-pill reveal" style="transition-delay:130ms;">Elementor</span>
+        <span class="skill-pill reveal" style="transition-delay:160ms;">Canva</span>
+        <span class="skill-pill reveal" style="transition-delay:190ms;">CINC</span>
+        <span class="skill-pill reveal" style="transition-delay:220ms;">Lofty</span>
+        <span class="skill-pill reveal" style="transition-delay:250ms;">GoHighLevel</span>
+        <span class="skill-pill reveal" style="transition-delay:280ms;">SkySlope</span>
+        <span class="skill-pill reveal" style="transition-delay:310ms;">SISU</span>
+        <span class="skill-pill reveal" style="transition-delay:340ms;">ChatGPT</span>
+        <span class="skill-pill reveal" style="transition-delay:370ms;">Claude</span>
+        <span class="skill-pill reveal" style="transition-delay:400ms;">Zapier</span>
+        <span class="skill-pill reveal" style="transition-delay:430ms;">Notion</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Case Studies ─── -->
+  <section id="case-studies" class="section-pad" style="background:rgba(255,255,255,0.015);">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">Case Studies</span>
+        <h2 class="section-title">Examples of real support work.</h2>
+      </div>
+      <div class="case-grid" style="margin-top:40px;">
+        <div class="shell reveal" style="transition-delay:60ms;"><div class="core">
+          <div class="case-row">
+            <span class="case-num">01</span>
+            <div>
+              <h3>Business Operations &amp; Executive Support</h3>
+              <p>Supported daily operations by organizing tasks, tracking follow-ups, preparing internal notes, coordinating priorities, and assisting leadership with administrative execution.</p>
+            </div>
+          </div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:110ms;"><div class="core">
+          <div class="case-row">
+            <span class="case-num">02</span>
+            <div>
+              <h3>CRM Administration &amp; Database Management</h3>
+              <p>Managed real estate CRM systems, organized leads, maintained database accuracy, supported pipeline stages, reviewed tags, and assisted with lead follow-up workflows.</p>
+            </div>
+          </div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:160ms;"><div class="core">
+          <div class="case-row">
+            <span class="case-num">03</span>
+            <div>
+              <h3>Marketing Operations &amp; Content Management</h3>
+              <p>Assisted with marketing tasks including website updates, listing content, basic design support, email content, social media materials, and content organization.</p>
+            </div>
+          </div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:210ms;"><div class="core">
+          <div class="case-row">
+            <span class="case-num">04</span>
+            <div>
+              <h3>Transaction &amp; Listing Coordination</h3>
+              <p>Supported listing preparation, real estate documentation, forms, deadlines, compliance-related organization, and communication between involved parties.</p>
+            </div>
+          </div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:260ms;"><div class="core">
+          <div class="case-row">
+            <span class="case-num">05</span>
+            <div>
+              <h3>Process Documentation &amp; Workflow Organization</h3>
+              <p>Created and maintained checklists, SOP-style notes, process guides, project folders, and workflow documentation to make recurring work easier to follow.</p>
+            </div>
+          </div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:310ms;"><div class="core">
+          <div class="case-row">
+            <span class="case-num">06</span>
+            <div>
+              <h3>AI Productivity &amp; Research Support</h3>
+              <p>Used AI tools to support research, content drafting, prompt creation, workflow planning, documentation, and productivity improvements while keeping outputs practical.</p>
+            </div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Projects ─── -->
+  <section id="projects" class="section-pad">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">Projects</span>
+        <h2 class="section-title">Portfolio project examples.</h2>
+      </div>
+      <div class="services-grid" style="margin-top:40px;">
+        <div class="shell reveal" style="transition-delay:60ms;"><div class="core">
+          <div class="srv-icon"><i class="ri-database-2-line"></i></div>
+          <div class="srv-title">CRM Cleanup &amp; Organization</div>
+          <div class="srv-desc">Organized lead data, reviewed tags, supported pipeline structure, and helped improve CRM usability.</div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:110ms;"><div class="core">
+          <div class="srv-icon"><i class="ri-global-line"></i></div>
+          <div class="srv-title">Website &amp; Content Updates</div>
+          <div class="srv-desc">Supported WordPress and Elementor website updates, page edits, listing content, and marketing materials.</div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:160ms;"><div class="core">
+          <div class="srv-icon"><i class="ri-file-list-3-line"></i></div>
+          <div class="srv-title">Workflow Documentation</div>
+          <div class="srv-desc">Prepared internal notes, checklists, and documentation to make repeatable processes easier to follow.</div>
+        </div></div>
+        <div class="shell reveal" style="transition-delay:210ms;"><div class="core">
+          <div class="srv-icon"><i class="ri-sparkling-2-line"></i></div>
+          <div class="srv-title">AI Productivity Setup</div>
+          <div class="srv-desc">Tested AI tools, organized prompts, supported research, and helped create productivity workflows.</div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Resume ─── -->
+  <section id="resume" class="section-pad" style="background:rgba(255,255,255,0.015);">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">Resume</span>
+        <h2 class="section-title">Professional summary.</h2>
+      </div>
+      <div style="margin-top:40px;">
+        <div class="shell shell-lg reveal">
+          <div class="core">
+            <span class="resume-title-line">Ralph Corteza</span>
+            <div style="font-size:0.82rem;color:rgba(255,255,255,0.25);font-weight:400;margin-bottom:20px;">
+              Operations Manager &bull; Executive Assistant &bull; CRM &amp; AI Productivity Specialist
+            </div>
+            <div class="resume-body">
+              <p>
+                Remote operations professional with nearly seven years of experience supporting
+                a Canadian real estate business. Skilled in executive assistance, CRM administration,
+                database management, marketing support, website management, transaction coordination,
+                documentation, workflow organization, and AI productivity support.
+              </p>
+            </div>
+            <div style="font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:#C8A84E;margin-bottom:12px;">Experience Areas</div>
+            <ul class="resume-list">
+              <li>Executive and administrative support</li>
+              <li>CRM and database management</li>
+              <li>Real estate transaction and listing coordination</li>
+              <li>Marketing operations and content support</li>
+              <li>Website updates using WordPress and Elementor</li>
+              <li>Workflow documentation and process organization</li>
+              <li>AI-assisted research, drafting, and productivity support</li>
+            </ul>
+            <div style="margin-top:28px;">
+              <a href="#contact" class="btn btn-primary">
+                Request resume
+                <span class="btn-icon-wrap"><i class="ri-arrow-right-up-line"></i></span>
+              </a>
+            </div>
+          </div>
         </div>
-        <div class="card">
-          <h3>CRM Administration</h3>
-          <p>Lead organization, database cleanup, pipeline support, tags, workflows, and basic automation coordination.</p>
-        </div>
-        <div class="card">
-          <h3>Business Operations</h3>
-          <p>Process organization, internal documentation, reporting support, task management, and operational follow-through.</p>
-        </div>
-        <div class="card">
-          <h3>Marketing Support</h3>
-          <p>Website updates, content management, Canva designs, listing support materials, and campaign coordination.</p>
-        </div>
-        <div class="card">
-          <h3>Transaction Support</h3>
-          <p>Document coordination, listing preparation, compliance support, forms, checklists, and deadline tracking.</p>
-        </div>
-        <div class="card">
-          <h3>AI Productivity Support</h3>
-          <p>Research, prompt building, workflow assistance, documentation, content drafting, and AI tool organization.</p>
-        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="skills" class="section">
-      <div class="section-heading">
-        <p class="eyebrow">Skills & Tools</p>
-        <h2>Practical Tools Used for Remote Operations</h2>
-      </div>
-
-      <div class="tools-list">
-        <span>Google Workspace</span>
-        <span>Microsoft Office</span>
-        <span>WordPress</span>
-        <span>Elementor</span>
-        <span>Canva</span>
-        <span>CINC</span>
-        <span>Lofty</span>
-        <span>GoHighLevel</span>
-        <span>SkySlope</span>
-        <span>SISU</span>
-        <span>ChatGPT</span>
-        <span>Claude</span>
-        <span>Zapier</span>
-        <span>Notion</span>
-      </div>
-    </section>
-
-    <section id="case-studies" class="section dark-section">
-      <div class="section-heading">
-        <p class="eyebrow">Case Studies</p>
-        <h2>Examples of Real Support Work</h2>
-      </div>
-
-      <div class="case-list">
-        <article class="case-card">
-          <h3>1. Business Operations & Executive Support</h3>
-          <p>
-            Supported daily business operations by organizing tasks, tracking follow-ups,
-            preparing internal notes, coordinating priorities, and assisting leadership with
-            administrative execution.
-          </p>
-        </article>
-
-        <article class="case-card">
-          <h3>2. CRM Administration & Database Management</h3>
-          <p>
-            Helped manage real estate CRM systems, organize leads, maintain database accuracy,
-            support pipeline stages, review tags, and assist with lead follow-up workflows.
-          </p>
-        </article>
-
-        <article class="case-card">
-          <h3>3. Marketing Operations & Content Management</h3>
-          <p>
-            Assisted with marketing tasks including website updates, listing content,
-            basic design support, email content, social media materials, and content organization.
-          </p>
-        </article>
-
-        <article class="case-card">
-          <h3>4. Transaction & Listing Coordination</h3>
-          <p>
-            Supported listing preparation, real estate documentation, forms, deadlines,
-            compliance-related organization, and communication between involved parties.
-          </p>
-        </article>
-
-        <article class="case-card">
-          <h3>5. Process Documentation & Workflow Organization</h3>
-          <p>
-            Created and maintained checklists, SOP-style notes, process guides, project folders,
-            and workflow documentation to make recurring work easier to follow.
-          </p>
-        </article>
-
-        <article class="case-card">
-          <h3>6. AI Productivity & Research Support</h3>
-          <p>
-            Used AI tools to support research, content drafting, prompt creation, workflow planning,
-            documentation, and productivity improvements while keeping outputs practical and reviewed.
-          </p>
-        </article>
-      </div>
-    </section>
-
-    <section id="projects" class="section">
-      <div class="section-heading">
-        <p class="eyebrow">Projects</p>
-        <h2>Portfolio Project Examples</h2>
-      </div>
-
-      <div class="card-grid">
-        <div class="card">
-          <h3>CRM Cleanup & Organization</h3>
-          <p>Organized lead data, reviewed tags, supported pipeline structure, and helped improve CRM usability.</p>
-        </div>
-        <div class="card">
-          <h3>Website & Content Updates</h3>
-          <p>Supported WordPress and Elementor website updates, page edits, listing content, and marketing materials.</p>
-        </div>
-        <div class="card">
-          <h3>Workflow Documentation</h3>
-          <p>Prepared internal notes, checklists, and documentation to make repeatable processes easier to follow.</p>
-        </div>
-        <div class="card">
-          <h3>AI Productivity Setup</h3>
-          <p>Tested AI tools, organized prompts, supported research, and helped create productivity workflows.</p>
+  <!-- ─── Contact ─── -->
+  <section id="contact" class="section-pad">
+    <div class="container" style="max-width:640px;">
+      <div class="reveal">
+        <div class="shell shell-lg" style="border-color:rgba(200,168,78,0.1);">
+          <div class="core contact-card">
+            <div class="srv-icon" style="margin:0 auto 20px;width:56px;height:56px;font-size:1.3rem;">
+              <i class="ri-mail-send-line"></i>
+            </div>
+            <span class="eyebrow" style="margin-bottom:12px;">Let's connect</span>
+            <h2 class="section-title" style="font-size:clamp(1.4rem,3vw,2rem);margin:0 auto;max-width:400px;">
+              For remote ops, executive support, and AI productivity roles
+            </h2>
+            <div style="margin-top:24px;">
+              <a href="mailto:razetroc@gmail.com" class="email-big">razetroc@gmail.com</a>
+            </div>
+            <div style="margin-top:20px;display:flex;justify-content:center;gap:16px;">
+              <a href="#" class="btn btn-outline" style="font-size:0.75rem;padding:10px 18px;"><i class="ri-linkedin-fill"></i> LinkedIn</a>
+              <a href="#" class="btn btn-outline" style="font-size:0.75rem;padding:10px 18px;"><i class="ri-github-fill"></i> GitHub</a>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="resume" class="section dark-section">
-      <div class="section-heading">
-        <p class="eyebrow">Resume</p>
-        <h2>Professional Summary</h2>
-      </div>
-
-      <div class="resume-box">
-        <h3>Ralph Corteza</h3>
-        <p class="resume-title">
-          Operations Manager | Executive Assistant | CRM & AI Productivity Specialist
-        </p>
-
-        <p>
-          Remote operations professional with nearly seven years of experience supporting
-          a Canadian real estate business. Skilled in executive assistance, CRM administration,
-          database management, marketing support, website management, transaction coordination,
-          documentation, workflow organization, and AI productivity support.
-        </p>
-
-        <h4>Relevant Experience Areas</h4>
-        <ul>
-          <li>Executive and administrative support</li>
-          <li>CRM and database management</li>
-          <li>Real estate transaction and listing coordination</li>
-          <li>Marketing operations and content support</li>
-          <li>Website updates using WordPress and Elementor</li>
-          <li>Workflow documentation and process organization</li>
-          <li>AI-assisted research, drafting, and productivity support</li>
-        </ul>
-
-        <a href="#contact" class="btn primary">Request Resume</a>
-      </div>
-    </section>
-
-    <section id="contact" class="section contact-section">
-      <div class="section-heading">
-        <p class="eyebrow">Contact</p>
-        <h2>Let’s connect.</h2>
-      </div>
-
-      <p>
-        For remote operations, executive support, CRM, business operations, marketing support,
-        and AI productivity roles, you can reach me at:
-      </p>
-
-      <a href="mailto:razetroc@gmail.com" class="email-link">razetroc@gmail.com</a>
-    </section>
-  </main>
-
+  <!-- ─── Footer ─── -->
   <footer>
-    <p>© <span id="year"></span> Ralph Corteza. All rights reserved.</p>
+    <p>&copy; <span id="year"></span> Ralph Corteza. All rights reserved. Built with precision.</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script>
+    // ── Hamburger ──
+    const ham = document.getElementById('hamBtn');
+    const overlay = document.getElementById('navOverlay');
+    let open = false;
+
+    ham.addEventListener('click', () => {
+      open = !open;
+      ham.classList.toggle('active');
+      overlay.classList.toggle('open');
+    });
+
+    document.querySelectorAll('.nav-link-mob').forEach(el => {
+      el.addEventListener('click', () => {
+        open = false;
+        ham.classList.remove('active');
+        overlay.classList.remove('open');
+      });
+    });
+
+    // ── Year ──
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ── Scroll Reveal ──
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+
+    document.querySelectorAll('.reveal, .reveal-l, .reveal-r').forEach(el => observer.observe(el));
+  </script>
 </body>
 </html>
